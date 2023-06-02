@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  zookeeper:
+    image: bitnami/zookeeper
+    container_name: zookeeper-container
+    ports:
+      - "2181:2181"
+    volumes:
+      - "D:/docker-volume/zookeeper-volume:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - kafka-network
+  kafka:
+    image: bitnami/kafka
+    container_name: kafka-container
+    ports:
+      - "9092:9092"
+    volumes:
+      - "D:/docker-volume/kafka-volume:/bitnami"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+    depends_on:
+      - zookeeper
+    networks:
+      - kafka-network
+
+volumes:
+  zookeeper-volume:
+    driver: local
+  kafka-volume:
+    driver: local
+
+networks:
+  kafka-network:
+    driver: bridge
